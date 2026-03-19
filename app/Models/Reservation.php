@@ -2,8 +2,12 @@
 
 namespace App\Models;
 
+use App\Enums\ReservationStatus;
+use Illuminate\Database\Eloquent\Builder;
 use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Illuminate\Database\Eloquent\Model;
+use Illuminate\Database\Eloquent\Relations\BelongsTo;
+use Illuminate\Database\Eloquent\Relations\HasOne;
 
 class Reservation extends Model
 {
@@ -11,10 +15,11 @@ class Reservation extends Model
 
     protected $fillable = [
         'user_id',
-        'book_id',
+        'copy_id',
         'reserved_at',
         'return_date',
         'returned_at',
+        'expires_at',
         'status',
         'notes',
     ];
@@ -23,20 +28,110 @@ class Reservation extends Model
         'reserved_at' => 'datetime',
         'return_date' => 'date',
         'returned_at' => 'datetime',
+        'expires_at' => 'datetime',
+        'status' => ReservationStatus::class,
     ];
 
-    public function user()
+    // ── Relationships ─────────────────────────────────
+
+    public function user(): BelongsTo
     {
         return $this->belongsTo(User::class);
     }
 
-    public function book()
+    public function copy(): BelongsTo
     {
-        return $this->belongsTo(Book::class);
+        return $this->belongsTo(Copy::class);
     }
+
+    /**
+     * Access the book through the copy relationship.
+     */
+    public function book(): BelongsTo
+    {
+        return $this->copy->book();
+    }
+
+    public function penalty(): HasOne
+    {
+        return $this->hasOne(Penalty::class);
+    }
+
+    // ── Scopes ────────────────────────────────────────
+
+    public function scopeActive(Builder $query): Builder
+    {
+        return $query->where('status', ReservationStatus::Active);
+    }
+
+    public function scopeLate(Builder $query): Builder
+    {
+        return $query->where('status', ReservationStatus::Late);
+    }
+
+    public function scopeExpired(Builder $query): Builder
+    {
+        return $query->where('status', ReservationStatus::Expired);
+    }
+
+    public function scopeForUser(Builder $query, int $userId): Builder
+    {
+        return $query->where('user_id', $userId);
+    }
+
+    public function scopeOverdue(Builder $query): Builder
+    {
+        return $query->where('status', ReservationStatus::Active)
+            ->whereNotNull('return_date')
+            ->whereDate('return_date', '<', now()->toDateString());
+    }
+
+    public function scopePastExpiration(Builder $query): Builder
+    {
+        return $query->where('status', ReservationStatus::Active)
+            ->whereNotNull('expires_at')
+            ->where('expires_at', '<', now());
+    }
+
+    // ── Domain Methods ────────────────────────────────
 
     public function isLate(): bool
     {
-        return $this->status === 'active' && $this->return_date && now()->greaterThan($this->return_date);
+        return $this->status === ReservationStatus::Active
+            && $this->return_date
+            && now()->greaterThan($this->return_date);
+    }
+
+    public function isExpired(): bool
+    {
+        return $this->status === ReservationStatus::Active
+            && $this->expires_at
+            && now()->greaterThan($this->expires_at);
+    }
+
+    public function canBeReturned(): bool
+    {
+        return in_array($this->status, [
+            ReservationStatus::Active,
+            ReservationStatus::Late,
+        ]);
+    }
+
+    public function markReturned(): void
+    {
+        $this->update([
+            'status' => ReservationStatus::Returned,
+            'returned_at' => now(),
+        ]);
+    }
+
+    public function markLate(): void
+    {
+        $this->update(['status' => ReservationStatus::Late]);
+    }
+
+    public function markExpired(): void
+    {
+        $this->update(['status' => ReservationStatus::Expired]);
     }
 }

@@ -29,6 +29,7 @@ class AuthenticatedSessionController extends Controller
         $user = $request->user();
         if ($user && ! $user->is_active) {
             Auth::guard('web')->logout();
+
             return redirect()->route('login')->withErrors(['email' => 'Your account is inactive.']);
         }
 

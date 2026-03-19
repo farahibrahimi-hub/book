@@ -14,13 +14,18 @@ return new class extends Migration
         Schema::create('reservations', function (Blueprint $table) {
             $table->id();
             $table->foreignId('user_id')->constrained()->cascadeOnDelete();
-            $table->foreignId('book_id')->constrained()->cascadeOnDelete();
+            $table->foreignId('copy_id')->constrained()->cascadeOnDelete();
             $table->timestamp('reserved_at')->useCurrent();
             $table->date('return_date')->nullable();
             $table->timestamp('returned_at')->nullable();
-            $table->enum('status', ['active', 'returned', 'late'])->default('active');
+            $table->timestamp('expires_at')->nullable();
+            $table->enum('status', ['active', 'returned', 'late', 'expired', 'cancelled'])->default('active');
             $table->text('notes')->nullable();
             $table->timestamps();
+
+            $table->index(['user_id', 'status']);
+            $table->index(['copy_id', 'status']);
+            $table->index(['status', 'expires_at']);
         });
     }
 

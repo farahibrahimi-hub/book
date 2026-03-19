@@ -12,8 +12,9 @@ class EnsureUserIsActive
     {
         $user = Auth::user();
 
-        if (!$user || !$user->is_active) {
+        if (! $user || ! $user->is_active) {
             Auth::logout();
+
             return redirect()->route('login')->with('error', 'Your account is inactive.');
         }
 

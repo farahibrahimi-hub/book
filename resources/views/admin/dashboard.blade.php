@@ -4,9 +4,9 @@
 <div class="space-y-6">
     <div class="grid grid-cols-1 md:grid-cols-4 gap-4">
         <x-stat-card title="Total Books" :value="$totalBooks" />
-        <x-stat-card title="Available Books" :value="\App\Models\Book::where('available_copies', '>', 0)->count()" />
-        <x-stat-card title="Total Users" :value="\App\Models\User::count()" />
-        <x-stat-card title="Active Users" :value="\App\Models\User::where('is_active', true)->count()" />
+        <x-stat-card title="Total Users" :value="$totalUsers" />
+        <x-stat-card title="Active Reservations" :value="$reservationStats['active']" />
+        <x-stat-card title="Late Reservations" :value="$reservationStats['late']" />
     </div>
 
     <div class="grid grid-cols-1 lg:grid-cols-2 gap-4">
@@ -34,9 +34,10 @@
         <x-card>
             <h3 class="text-lg font-semibold mb-2">Late Reservations</h3>
             <ul class="space-y-2">
-                @foreach(\App\Models\Reservation::where('status', 'late')->with('user', 'book')->latest()->limit(5)->get() as $res)
+                @foreach(\App\Models\Reservation::late()->with(['user', 'copy.book'])->latest()->limit(5)->get() as $res)
                     <li class="p-2 bg-red-50 dark:bg-red-900 rounded">
-                        {{ $res->book->title }} by {{ $res->user->name }} ({{ $res->return_date->diffInDays(now()) }} days overdue)
+                        {{ $res->copy->book->title ?? 'N/A' }} by {{ $res->user->name }}
+                        ({{ $res->return_date ? $res->return_date->diffInDays(now()) . ' days overdue' : 'N/A' }})
                     </li>
                 @endforeach
             </ul>
@@ -88,14 +89,15 @@ let statusCtx = document.getElementById('statusChart').getContext('2d');
 new Chart(statusCtx, {
     type: 'doughnut',
     data: {
-        labels: ['Active', 'Returned', 'Late'],
+        labels: ['Active', 'Returned', 'Late', 'Expired'],
         datasets: [{
             data: [
-                {{ \App\Models\Reservation::where('status', 'active')->count() }},
-                {{ \App\Models\Reservation::where('status', 'returned')->count() }},
-                {{ \App\Models\Reservation::where('status', 'late')->count() }}
+                {{ $reservationStats['active'] }},
+                {{ $reservationStats['returned'] }},
+                {{ $reservationStats['late'] }},
+                {{ $reservationStats['expired'] }}
             ],
-            backgroundColor: ['#4f46e5', '#10b981', '#f59e0b']
+            backgroundColor: ['#4f46e5', '#10b981', '#f59e0b', '#6b7280']
         }]
     }
 });

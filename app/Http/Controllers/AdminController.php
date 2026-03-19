@@ -5,50 +5,47 @@ namespace App\Http\Controllers;
 use App\Models\Book;
 use App\Models\Reservation;
 use App\Models\User;
-use Illuminate\Http\Request;
-use Illuminate\Support\Facades\Auth;
+use App\Services\ReservationService;
 
 class AdminController extends Controller
 {
-    public function dashboard()
+    public function __construct()
     {
-        /** @var User|null $user */
-        $user = Auth::user();
-        if (!$user || !$user->isAdmin()) {
-            abort(403);
-        }
+        $this->middleware(['auth', 'verified']);
+        $this->authorizeResource(Book::class, null, ['only' => []]);
+    }
+
+    public function dashboard(ReservationService $reservationService)
+    {
+        $this->authorize('create', Book::class);
+
+        $stats = $reservationService->getStats();
 
         return view('admin.dashboard', [
             'totalBooks' => Book::count(),
-            'totalReservations' => Reservation::count(),
-            'lateReservations' => Reservation::where('status', 'late')->count(),
+            'totalUsers' => User::count(),
+            'reservationStats' => $stats,
         ]);
     }
 
     public function books()
     {
-        /** @var User|null $user */
-        $user = Auth::user();
-        if (!$user || !$user->isAdmin()) {
-            abort(403);
-        }
+        $this->authorize('create', Book::class);
 
-        $books = Book::paginate(12);
+        $books = Book::withCount([
+            'copies',
+            'copies as available_copies_count' => fn ($q) => $q->available(),
+        ])->paginate(12);
 
         return view('admin.books.index', compact('books'));
     }
 
     public function reservations()
     {
-        /** @var User|null $user */
-        $user = Auth::user();
-        if (!$user || !$user->isAdmin()) {
-            abort(403);
-        }
+        $this->authorize('create', Book::class);
 
-        $reservations = Reservation::with(['user', 'book'])->paginate(12);
+        $reservations = Reservation::with(['user', 'copy.book'])->paginate(12);
 
         return view('admin.reservations.index', compact('reservations'));
     }
 }
-

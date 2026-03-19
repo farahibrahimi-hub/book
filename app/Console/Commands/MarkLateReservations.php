@@ -2,18 +2,26 @@
 
 namespace App\Console\Commands;
 
+use App\Jobs\ExpireReservationsJob;
 use App\Services\ReservationService;
 use Illuminate\Console\Command;
 
 class MarkLateReservations extends Command
 {
-    protected $signature = 'reservations:mark-late';
-    protected $description = 'Mark overdue reservations as late';
+    protected $signature = 'reservations:process-overdue';
 
-    public function handle(ReservationService $service)
+    protected $description = 'Mark overdue reservations as late and process expired reservations';
+
+    public function handle(ReservationService $service): int
     {
-        $count = $service->markLate();
-        $this->info("Marked {$count} reservation(s) as late.");
-        return 0;
+        // Mark late reservations
+        $lateCount = $service->markLate();
+        $this->info("Marked {$lateCount} reservation(s) as late.");
+
+        // Process expired reservations
+        ExpireReservationsJob::dispatchSync();
+        $this->info('Processed expired reservations.');
+
+        return self::SUCCESS;
     }
 }

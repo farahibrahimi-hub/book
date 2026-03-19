@@ -2,66 +2,59 @@
 
 namespace App\Services;
 
-use App\Models\Book;
+use App\Enums\ReservationStatus;
 use App\Models\Reservation;
 use App\Models\User;
-use Illuminate\Support\Carbon;
+use Illuminate\Contracts\Pagination\Paginator;
 
 class ReservationService
 {
-    public function reserve(User $user, Book $book, ?string $notes = null): Reservation
+    /**
+     * List reservations for a user (or all if admin).
+     */
+    public function listForUser(User $user, array $filters = []): Paginator
     {
-        $activeReservations = $user->reservations()->where('status', 'active')->count();
-        if ($activeReservations >= 3) {
-            throw new \InvalidArgumentException('Max 3 active reservations allowed.');
+        $query = Reservation::with(['copy.book', 'user']);
+
+        if (! $user->isAdmin()) {
+            $query->forUser($user->id);
         }
 
-        if ($book->available_copies < 1) {
-            throw new \InvalidArgumentException('No copies available.');
+        if (! empty($filters['status'])) {
+            $status = ReservationStatus::tryFrom($filters['status']);
+            if ($status) {
+                $query->where('status', $status);
+            }
         }
 
-        $existing = $user->reservations()->where('book_id', $book->id)->where('status', 'active')->first();
-        if ($existing) {
-            throw new \InvalidArgumentException('You already reserved this book.');
-        }
-
-        $reservation = Reservation::create([
-            'user_id' => $user->id,
-            'book_id' => $book->id,
-            'reserved_at' => now(),
-            'return_date' => now()->addDays(7),
-            'status' => 'active',
-            'notes' => $notes,
-        ]);
-
-        $book->decrement('available_copies');
-
-        return $reservation;
+        return $query->latest('reserved_at')->paginate(12);
     }
 
-    public function return(Reservation $reservation): Reservation
-    {
-        if ($reservation->status !== 'active' && $reservation->status !== 'late') {
-            throw new \InvalidArgumentException('This reservation cannot be returned.');
-        }
-
-        $reservation->status = 'returned';
-        $reservation->returned_at = now();
-        $reservation->save();
-
-        $reservation->book->increment('available_copies');
-
-        return $reservation;
-    }
-
+    /**
+     * Mark overdue reservations as late.
+     */
     public function markLate(): int
     {
-        $toLate = Reservation::where('status', 'active')->whereDate('return_date', '<', now()->toDateString())->get();
-        foreach ($toLate as $reservation) {
-            $reservation->status = 'late';
-            $reservation->save();
+        $overdue = Reservation::overdue()->get();
+
+        foreach ($overdue as $reservation) {
+            $reservation->markLate();
         }
 
-        return $toLate->count();
+        return $overdue->count();
+    }
+
+    /**
+     * Get dashboard statistics.
+     */
+    public function getStats(): array
+    {
+        return [
+            'total' => Reservation::count(),
+            'active' => Reservation::active()->count(),
+            'late' => Reservation::late()->count(),
+            'returned' => Reservation::where('status', ReservationStatus::Returned)->count(),
+            'expired' => Reservation::expired()->count(),
+        ];
     }
 }

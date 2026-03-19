@@ -2,7 +2,7 @@
 
 namespace App\Models;
 
-// use Illuminate\Contracts\Auth\MustVerifyEmail;
+use App\Enums\UserRole;
 use Database\Factories\UserFactory;
 use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Illuminate\Database\Eloquent\Relations\HasMany;
@@ -49,16 +49,47 @@ class User extends Authenticatable
         'last_login_at' => 'datetime',
         'is_active' => 'boolean',
         'password' => 'hashed',
+        'role' => UserRole::class,
     ];
 
-    public function isAdmin(): bool
-    {
-        return $this->role === 'admin';
-    }
+    // ── Relationships ─────────────────────────────────
 
-    public function reservations()
+    public function reservations(): HasMany
     {
         return $this->hasMany(Reservation::class);
     }
-}
 
+    public function penalties(): HasMany
+    {
+        return $this->hasMany(Penalty::class);
+    }
+
+    public function waitingQueues(): HasMany
+    {
+        return $this->hasMany(WaitingQueue::class);
+    }
+
+    // ── Domain Methods ────────────────────────────────
+
+    public function isAdmin(): bool
+    {
+        return $this->role === UserRole::Admin;
+    }
+
+    public function hasActivePenalty(): bool
+    {
+        return $this->penalties()->active()->exists();
+    }
+
+    public function activeReservationsCount(): int
+    {
+        return $this->reservations()->active()->count();
+    }
+
+    public function canReserve(): bool
+    {
+        return $this->is_active
+            && ! $this->hasActivePenalty()
+            && $this->activeReservationsCount() < 3;
+    }
+}

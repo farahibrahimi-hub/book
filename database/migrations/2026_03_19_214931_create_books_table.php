@@ -19,11 +19,12 @@ return new class extends Migration
             $table->string('cover_image')->nullable();
             $table->string('genre')->nullable();
             $table->string('isbn')->nullable()->unique();
-            $table->unsignedInteger('available_copies')->default(1);
-            $table->unsignedInteger('total_copies')->default(1);
             $table->date('published_at')->nullable();
             $table->softDeletes();
             $table->timestamps();
+
+            $table->index('genre');
+            $table->fullText(['title', 'author']);
         });
     }
 

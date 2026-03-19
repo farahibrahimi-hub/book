@@ -3,25 +3,31 @@
 namespace App\Services;
 
 use App\Models\Book;
-use Illuminate\Support\Collection;
+use Illuminate\Contracts\Pagination\Paginator;
 
 class BookService
 {
-    public function list(array $filters = []): \Illuminate\Contracts\Pagination\Paginator
+    public function list(array $filters = []): Paginator
     {
-        $query = Book::query();
+        $query = Book::withCount([
+            'copies',
+            'copies as available_copies_count' => fn ($q) => $q->available(),
+        ]);
 
-        if (!empty($filters['search'])) {
-            $query->where('title', 'like', '%'.$filters['search'].'%')
-                ->orWhere('author', 'like', '%'.$filters['search'].'%');
+        if (! empty($filters['search'])) {
+            $search = $filters['search'];
+            $query->where(function ($q) use ($search) {
+                $q->where('title', 'like', '%'.$search.'%')
+                    ->orWhere('author', 'like', '%'.$search.'%');
+            });
         }
 
-        if (!empty($filters['genre'])) {
+        if (! empty($filters['genre'])) {
             $query->where('genre', $filters['genre']);
         }
 
-        if (!empty($filters['available'])) {
-            $query->where('available_copies', '>', 0);
+        if (! empty($filters['available'])) {
+            $query->having('available_copies_count', '>', 0);
         }
 
         return $query->orderBy('title')->paginate(12);
@@ -29,13 +35,13 @@ class BookService
 
     public function create(array $data): Book
     {
-        $book = Book::create($data);
-        return $book;
+        return Book::create($data);
     }
 
     public function update(Book $book, array $data): Book
     {
         $book->update($data);
+
         return $book;
     }
 
@@ -44,12 +50,17 @@ class BookService
         return $book->delete();
     }
 
-    public function calculateAvailabilityPercent(Book $book): float
+    /**
+     * Get list of unique genres for filter dropdowns.
+     */
+    public function getGenres(): array
     {
-        if ($book->total_copies <= 0) {
-            return 0;
-        }
-
-        return round(($book->available_copies / $book->total_copies) * 100, 2);
+        return Book::query()
+            ->distinct()
+            ->whereNotNull('genre')
+            ->pluck('genre')
+            ->sort()
+            ->values()
+            ->toArray();
     }
 }

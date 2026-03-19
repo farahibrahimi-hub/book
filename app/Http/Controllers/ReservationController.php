@@ -2,51 +2,52 @@
 
 namespace App\Http\Controllers;
 
+use App\Actions\ReserveBookAction;
+use App\Actions\ReturnBookAction;
+use App\Http\Middleware\EnsureUserIsActive;
 use App\Http\Requests\StoreReservationRequest;
 use App\Models\Book;
 use App\Models\Reservation;
 use App\Models\User;
 use App\Services\ReservationService;
-use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Auth;
 
 class ReservationController extends Controller
 {
-    public function __construct(protected ReservationService $service)
-    {
-        $this->middleware(['auth', 'verified', \App\Http\Middleware\EnsureUserIsActive::class]);
+    public function __construct(
+        protected ReservationService $service,
+        protected ReserveBookAction $reserveAction,
+        protected ReturnBookAction $returnAction,
+    ) {
+        $this->middleware(['auth', 'verified', EnsureUserIsActive::class]);
     }
 
     public function index()
     {
-        /** @var User|null $user */
+        /** @var User $user */
         $user = Auth::user();
 
-        if ($user && $user->isAdmin()) {
-            $reservations = Reservation::with(['user', 'book'])->get();
-        } else {
-            $reservations = Reservation::with('book')->where('user_id', $user->id)->get();
-        }
-
-        foreach ($reservations as $reservation) {
-            if ($reservation->isLate()) {
-                $reservation->status = 'late';
-                $reservation->save();
-            }
-        }
+        $reservations = $this->service->listForUser($user);
 
         return view('reservations.index', compact('reservations'));
     }
 
     public function store(StoreReservationRequest $request)
     {
+        /** @var User $user */
         $user = Auth::user();
         $book = Book::findOrFail($request->book_id);
 
         try {
-            $this->service->reserve($user, $book, $request->input('notes'));
+            $result = $this->reserveAction->execute($user, $book, $request->input('notes'));
 
-            return redirect()->route('reservations.index')->with('success', 'Book reserved successfully.');
+            if ($result['queued']) {
+                return redirect()->route('reservations.index')
+                    ->with('info', "No copies available. You've been added to the waiting queue at position #{$result['position']}.");
+            }
+
+            return redirect()->route('reservations.index')
+                ->with('success', 'Book reserved successfully.');
         } catch (\InvalidArgumentException $e) {
             return redirect()->back()->with('error', $e->getMessage());
         }
@@ -54,17 +55,18 @@ class ReservationController extends Controller
 
     public function returnBook(Reservation $reservation)
     {
-        /** @var User|null $user */
+        /** @var User $user */
         $user = Auth::user();
 
-        if (!$user->isAdmin() && $reservation->user_id !== $user->id) {
+        if (! $user->isAdmin() && $reservation->user_id !== $user->id) {
             abort(403);
         }
 
         try {
-            $this->service->return($reservation);
+            $this->returnAction->execute($reservation);
 
-            return redirect()->route('reservations.index')->with('success', 'Book returned successfully.');
+            return redirect()->route('reservations.index')
+                ->with('success', 'Book returned successfully.');
         } catch (\InvalidArgumentException $e) {
             return redirect()->back()->with('error', $e->getMessage());
         }

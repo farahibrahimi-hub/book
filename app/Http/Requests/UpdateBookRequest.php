@@ -9,26 +9,27 @@ class UpdateBookRequest extends FormRequest
 {
     public function authorize(): bool
     {
-        return auth()->check() && auth()->user()->isAdmin();
+        return $this->user()?->isAdmin() ?? false;
     }
 
+    /**
+     * @return array<string, array<int, mixed>>
+     */
     public function rules(): array
     {
         return [
-            'title' => 'required|string|max:255',
-            'author' => 'required|string|max:255',
-            'description' => 'nullable|string',
-            'cover_image' => 'nullable|image|max:2048',
-            'genre' => 'required|string|max:255',
+            'title' => ['required', 'string', 'max:255'],
+            'author' => ['required', 'string', 'max:255'],
+            'description' => ['nullable', 'string', 'max:5000'],
+            'cover_image' => ['nullable', 'string', 'max:500'],
+            'genre' => ['nullable', 'string', 'max:100'],
             'isbn' => [
                 'nullable',
                 'string',
-                'max:50',
-                Rule::unique('books', 'isbn')->ignore($this->route('book')->id),
+                'max:20',
+                Rule::unique('books', 'isbn')->ignore($this->route('book')?->id),
             ],
-            'available_copies' => 'required|integer|min:0',
-            'total_copies' => 'required|integer|min:1',
-            'published_at' => 'nullable|date',
+            'published_at' => ['nullable', 'date', 'before_or_equal:today'],
         ];
     }
 }

@@ -1,0 +1,781 @@
+
+   PASS  Tests\Unit\BookServiceTest
+  ✓ list returns paginated books with copy counts                        1.03s  
+  ✓ list filters by search term                                          0.01s  
+  ✓ list filters available books only                                    0.01s  
+  ✓ get unique genres                                                    0.01s  
+
+   PASS  Tests\Unit\ExampleTest
+  ✓ that true is true
+
+   FAIL  Tests\Unit\ReservationServiceTest
+  ⨯ user can reserve a book with available copy                          0.02s  
+  ⨯ user is enqueued when no copies available                            0.01s  
+  ⨯ user cannot reserve same book twice                                  0.01s  
+  ✓ user with penalty cannot reserve                                     0.01s  
+  ⨯ user cannot exceed max 3 active reservations                         0.01s  
+  ✓ user can return a reservation                                        0.03s  
+  ✓ cannot return already returned reservation                           0.01s  
+
+   FAIL  Tests\Feature\AdminTest
+  ⨯ admin can access dashboard                                           0.15s  
+  ⨯ user cannot access admin dashboard                                   0.12s  
+
+   FAIL  Tests\Feature\Auth\AuthenticationTest
+  ⨯ login screen can be rendered                                         0.12s  
+  ⨯ users can authenticate using the login screen                        0.12s  
+  ⨯ users can not authenticate with invalid password                     0.11s  
+  ⨯ users can logout                                                     0.11s  
+
+   FAIL  Tests\Feature\Auth\EmailVerificationTest
+  ⨯ email verification screen can be rendered                            0.11s  
+  ⨯ email can be verified                                                0.12s  
+  ⨯ email is not verified with invalid hash                              0.11s  
+
+   FAIL  Tests\Feature\Auth\PasswordConfirmationTest
+  ⨯ confirm password screen can be rendered                              0.11s  
+  ⨯ password can be confirmed                                            0.12s  
+  ⨯ password is not confirmed with invalid password                      0.11s  
+
+   FAIL  Tests\Feature\Auth\PasswordResetTest
+  ⨯ reset password link screen can be rendered                           0.11s  
+  ⨯ reset password link can be requested                                 0.11s  
+  ⨯ reset password screen can be rendered                                0.11s  
+  ⨯ password can be reset with valid token                               0.11s  
+
+   FAIL  Tests\Feature\Auth\PasswordUpdateTest
+  ⨯ password can be updated                                              0.11s  
+  ⨯ correct password must be provided to update password                 0.13s  
+
+   FAIL  Tests\Feature\Auth\RegistrationTest
+  ⨯ registration screen can be rendered                                  0.11s  
+  ⨯ new users can register                                               0.11s  
+
+   FAIL  Tests\Feature\BookTest
+  ⨯ guest cannot view books                                              0.11s  
+  ⨯ user can view books list                                             0.14s  
+  ⨯ admin can create a book                                              0.12s  
+  ⨯ user cannot create a book                                            0.14s  
+  ⨯ admin can add copies to a book                                       0.18s  
+
+   FAIL  Tests\Feature\ExampleTest
+  ⨯ it returns a successful response                                     0.12s  
+
+   FAIL  Tests\Feature\ProfileTest
+  ⨯ profile page is displayed                                            0.14s  
+  ⨯ profile information can be updated                                   0.12s  
+  ⨯ email verification status is unchanged when the email address is un… 0.12s  
+  ⨯ user can delete their account                                        0.11s  
+  ⨯ correct password must be provided to delete account                  0.13s  
+
+   FAIL  Tests\Feature\ReservationTest
+  ⨯ user can view their reservations                                     0.12s  
+  ⨯ user can reserve an available book                                   0.12s  
+  ⨯ user gets queued when no copies available                            0.12s  
+  ⨯ user can return a book                                               0.13s  
+  ────────────────────────────────────────────────────────────────────────────  
+   FAILED  Tests\Unit\ReservationServiceTest > use…  InvalidArgumentException   
+  Your account is not active.
+
+  at app/Actions/ReserveBookAction.php:55
+     51▕             if ($user->activeReservationsCount() >= 3) {
+     52▕                 throw new \InvalidArgumentException('Max 3 active reservations allowed.');
+     53▕             }
+     54▕ 
+  ➜  55▕             throw new \InvalidArgumentException('Your account is not active.');
+     56▕         }
+     57▕ 
+     58▕         // Check if user already has an active reservation for any copy of this book
+     59▕         $hasExisting = Reservation::where('user_id', $user->id)
+
+  1   app/Actions/ReserveBookAction.php:55
+  2   app/Actions/ReserveBookAction.php:27
+
+  ────────────────────────────────────────────────────────────────────────────  
+   FAILED  Tests\Unit\ReservationServiceTest > use…  InvalidArgumentException   
+  Your account is not active.
+
+  at app/Actions/ReserveBookAction.php:55
+     51▕             if ($user->activeReservationsCount() >= 3) {
+     52▕                 throw new \InvalidArgumentException('Max 3 active reservations allowed.');
+     53▕             }
+     54▕ 
+  ➜  55▕             throw new \InvalidArgumentException('Your account is not active.');
+     56▕         }
+     57▕ 
+     58▕         // Check if user already has an active reservation for any copy of this book
+     59▕         $hasExisting = Reservation::where('user_id', $user->id)
+
+  1   app/Actions/ReserveBookAction.php:55
+  2   app/Actions/ReserveBookAction.php:27
+
+  ────────────────────────────────────────────────────────────────────────────  
+   FAILED  Tests\Unit\ReservationServiceTest > use…  InvalidArgumentException   
+  Your account is not active.
+
+  at app/Actions/ReserveBookAction.php:55
+     51▕             if ($user->activeReservationsCount() >= 3) {
+     52▕                 throw new \InvalidArgumentException('Max 3 active reservations allowed.');
+     53▕             }
+     54▕ 
+  ➜  55▕             throw new \InvalidArgumentException('Your account is not active.');
+     56▕         }
+     57▕ 
+     58▕         // Check if user already has an active reservation for any copy of this book
+     59▕         $hasExisting = Reservation::where('user_id', $user->id)
+
+  1   app/Actions/ReserveBookAction.php:55
+  2   app/Actions/ReserveBookAction.php:27
+
+  ────────────────────────────────────────────────────────────────────────────  
+   FAILED  Tests\Unit\ReservationServiceTest > use…  InvalidArgumentException   
+  Your account is not active.
+
+  at app/Actions/ReserveBookAction.php:55
+     51▕             if ($user->activeReservationsCount() >= 3) {
+     52▕                 throw new \InvalidArgumentException('Max 3 active reservations allowed.');
+     53▕             }
+     54▕ 
+  ➜  55▕             throw new \InvalidArgumentException('Your account is not active.');
+     56▕         }
+     57▕ 
+     58▕         // Check if user already has an active reservation for any copy of this book
+     59▕         $hasExisting = Reservation::where('user_id', $user->id)
+
+  1   app/Actions/ReserveBookAction.php:55
+  2   app/Actions/ReserveBookAction.php:27
+
+  ────────────────────────────────────────────────────────────────────────────  
+   FAILED  Tests\Feature\AdminTest > admin can acces…  MissingAppKeyException   
+  No application encryption key has been specified.
+
+  at vendor/laravel/framework/src/Illuminate/Encryption/EncryptionServiceProvider.php:83
+     79▕     protected function key(array $config)
+     80▕     {
+     81▕         return tap($config['key'], function ($key) {
+     82▕             if (empty($key)) {
+  ➜  83▕                 throw new MissingAppKeyException;
+     84▕             }
+     85▕         });
+     86▕     }
+     87▕ }
+
+      [2m+19 vendor frames [22m
+  20  tests/Feature/AdminTest.php:11
+
+  ────────────────────────────────────────────────────────────────────────────  
+   FAILED  Tests\Feature\AdminTest > user cannot acc…  MissingAppKeyException   
+  No application encryption key has been specified.
+
+  at vendor/laravel/framework/src/Illuminate/Encryption/EncryptionServiceProvider.php:83
+     79▕     protected function key(array $config)
+     80▕     {
+     81▕         return tap($config['key'], function ($key) {
+     82▕             if (empty($key)) {
+  ➜  83▕                 throw new MissingAppKeyException;
+     84▕             }
+     85▕         });
+     86▕     }
+     87▕ }
+
+      [2m+19 vendor frames [22m
+  20  tests/Feature/AdminTest.php:19
+
+  ────────────────────────────────────────────────────────────────────────────  
+   FAILED  Tests\Feature\Auth\AuthenticationTest > l…  MissingAppKeyException   
+  No application encryption key has been specified.
+
+  at vendor/laravel/framework/src/Illuminate/Encryption/EncryptionServiceProvider.php:83
+     79▕     protected function key(array $config)
+     80▕     {
+     81▕         return tap($config['key'], function ($key) {
+     82▕             if (empty($key)) {
+  ➜  83▕                 throw new MissingAppKeyException;
+     84▕             }
+     85▕         });
+     86▕     }
+     87▕ }
+
+      [2m+19 vendor frames [22m
+  20  tests/Feature/Auth/AuthenticationTest.php:6
+
+  ────────────────────────────────────────────────────────────────────────────  
+   FAILED  Tests\Feature\Auth\AuthenticationTest > u…  MissingAppKeyException   
+  No application encryption key has been specified.
+
+  at vendor/laravel/framework/src/Illuminate/Encryption/EncryptionServiceProvider.php:83
+     79▕     protected function key(array $config)
+     80▕     {
+     81▕         return tap($config['key'], function ($key) {
+     82▕             if (empty($key)) {
+  ➜  83▕                 throw new MissingAppKeyException;
+     84▕             }
+     85▕         });
+     86▕     }
+     87▕ }
+
+      [2m+19 vendor frames [22m
+  20  tests/Feature/Auth/AuthenticationTest.php:14
+
+  ────────────────────────────────────────────────────────────────────────────  
+   FAILED  Tests\Feature\Auth\AuthenticationTest > u…  MissingAppKeyException   
+  No application encryption key has been specified.
+
+  at vendor/laravel/framework/src/Illuminate/Encryption/EncryptionServiceProvider.php:83
+     79▕     protected function key(array $config)
+     80▕     {
+     81▕         return tap($config['key'], function ($key) {
+     82▕             if (empty($key)) {
+  ➜  83▕                 throw new MissingAppKeyException;
+     84▕             }
+     85▕         });
+     86▕     }
+     87▕ }
+
+      [2m+19 vendor frames [22m
+  20  tests/Feature/Auth/AuthenticationTest.php:26
+
+  ────────────────────────────────────────────────────────────────────────────  
+   FAILED  Tests\Feature\Auth\AuthenticationTest > u…  MissingAppKeyException   
+  No application encryption key has been specified.
+
+  at vendor/laravel/framework/src/Illuminate/Encryption/EncryptionServiceProvider.php:83
+     79▕     protected function key(array $config)
+     80▕     {
+     81▕         return tap($config['key'], function ($key) {
+     82▕             if (empty($key)) {
+  ➜  83▕                 throw new MissingAppKeyException;
+     84▕             }
+     85▕         });
+     86▕     }
+     87▕ }
+
+      [2m+19 vendor frames [22m
+  20  tests/Feature/Auth/AuthenticationTest.php:37
+
+  ────────────────────────────────────────────────────────────────────────────  
+   FAILED  Tests\Feature\Auth\EmailVerificationTest…   MissingAppKeyException   
+  No application encryption key has been specified.
+
+  at vendor/laravel/framework/src/Illuminate/Encryption/EncryptionServiceProvider.php:83
+     79▕     protected function key(array $config)
+     80▕     {
+     81▕         return tap($config['key'], function ($key) {
+     82▕             if (empty($key)) {
+  ➜  83▕                 throw new MissingAppKeyException;
+     84▕             }
+     85▕         });
+     86▕     }
+     87▕ }
+
+      [2m+19 vendor frames [22m
+  20  tests/Feature/Auth/EmailVerificationTest.php:11
+
+  ────────────────────────────────────────────────────────────────────────────  
+   FAILED  Tests\Feature\Auth\EmailVerificationTest…   MissingAppKeyException   
+  No application encryption key has been specified.
+
+  at vendor/laravel/framework/src/Illuminate/Encryption/EncryptionServiceProvider.php:83
+     79▕     protected function key(array $config)
+     80▕     {
+     81▕         return tap($config['key'], function ($key) {
+     82▕             if (empty($key)) {
+  ➜  83▕                 throw new MissingAppKeyException;
+     84▕             }
+     85▕         });
+     86▕     }
+     87▕ }
+
+      [2m+19 vendor frames [22m
+  20  tests/Feature/Auth/EmailVerificationTest.php:27
+
+  ────────────────────────────────────────────────────────────────────────────  
+   FAILED  Tests\Feature\Auth\EmailVerificationTest…   MissingAppKeyException   
+  No application encryption key has been specified.
+
+  at vendor/laravel/framework/src/Illuminate/Encryption/EncryptionServiceProvider.php:83
+     79▕     protected function key(array $config)
+     80▕     {
+     81▕         return tap($config['key'], function ($key) {
+     82▕             if (empty($key)) {
+  ➜  83▕                 throw new MissingAppKeyException;
+     84▕             }
+     85▕         });
+     86▕     }
+     87▕ }
+
+      [2m+19 vendor frames [22m
+  20  tests/Feature/Auth/EmailVerificationTest.php:43
+
+  ────────────────────────────────────────────────────────────────────────────  
+   FAILED  Tests\Feature\Auth\PasswordConfirmationTe…  MissingAppKeyException   
+  No application encryption key has been specified.
+
+  at vendor/laravel/framework/src/Illuminate/Encryption/EncryptionServiceProvider.php:83
+     79▕     protected function key(array $config)
+     80▕     {
+     81▕         return tap($config['key'], function ($key) {
+     82▕             if (empty($key)) {
+  ➜  83▕                 throw new MissingAppKeyException;
+     84▕             }
+     85▕         });
+     86▕     }
+     87▕ }
+
+      [2m+19 vendor frames [22m
+  20  tests/Feature/Auth/PasswordConfirmationTest.php:8
+
+  ────────────────────────────────────────────────────────────────────────────  
+   FAILED  Tests\Feature\Auth\PasswordConfirmationTe…  MissingAppKeyException   
+  No application encryption key has been specified.
+
+  at vendor/laravel/framework/src/Illuminate/Encryption/EncryptionServiceProvider.php:83
+     79▕     protected function key(array $config)
+     80▕     {
+     81▕         return tap($config['key'], function ($key) {
+     82▕             if (empty($key)) {
+  ➜  83▕                 throw new MissingAppKeyException;
+     84▕             }
+     85▕         });
+     86▕     }
+     87▕ }
+
+      [2m+19 vendor frames [22m
+  20  tests/Feature/Auth/PasswordConfirmationTest.php:16
+
+  ────────────────────────────────────────────────────────────────────────────  
+   FAILED  Tests\Feature\Auth\PasswordConfirmationTe…  MissingAppKeyException   
+  No application encryption key has been specified.
+
+  at vendor/laravel/framework/src/Illuminate/Encryption/EncryptionServiceProvider.php:83
+     79▕     protected function key(array $config)
+     80▕     {
+     81▕         return tap($config['key'], function ($key) {
+     82▕             if (empty($key)) {
+  ➜  83▕                 throw new MissingAppKeyException;
+     84▕             }
+     85▕         });
+     86▕     }
+     87▕ }
+
+      [2m+19 vendor frames [22m
+  20  tests/Feature/Auth/PasswordConfirmationTest.php:27
+
+  ────────────────────────────────────────────────────────────────────────────  
+   FAILED  Tests\Feature\Auth\PasswordResetTest > re…  MissingAppKeyException   
+  No application encryption key has been specified.
+
+  at vendor/laravel/framework/src/Illuminate/Encryption/EncryptionServiceProvider.php:83
+     79▕     protected function key(array $config)
+     80▕     {
+     81▕         return tap($config['key'], function ($key) {
+     82▕             if (empty($key)) {
+  ➜  83▕                 throw new MissingAppKeyException;
+     84▕             }
+     85▕         });
+     86▕     }
+     87▕ }
+
+      [2m+19 vendor frames [22m
+  20  tests/Feature/Auth/PasswordResetTest.php:8
+
+  ────────────────────────────────────────────────────────────────────────────  
+   FAILED  Tests\Feature\Auth\PasswordResetTest > re…  MissingAppKeyException   
+  No application encryption key has been specified.
+
+  at vendor/laravel/framework/src/Illuminate/Encryption/EncryptionServiceProvider.php:83
+     79▕     protected function key(array $config)
+     80▕     {
+     81▕         return tap($config['key'], function ($key) {
+     82▕             if (empty($key)) {
+  ➜  83▕                 throw new MissingAppKeyException;
+     84▕             }
+     85▕         });
+     86▕     }
+     87▕ }
+
+      [2m+19 vendor frames [22m
+  20  tests/Feature/Auth/PasswordResetTest.php:18
+
+  ────────────────────────────────────────────────────────────────────────────  
+   FAILED  Tests\Feature\Auth\PasswordResetTest > re…  MissingAppKeyException   
+  No application encryption key has been specified.
+
+  at vendor/laravel/framework/src/Illuminate/Encryption/EncryptionServiceProvider.php:83
+     79▕     protected function key(array $config)
+     80▕     {
+     81▕         return tap($config['key'], function ($key) {
+     82▕             if (empty($key)) {
+  ➜  83▕                 throw new MissingAppKeyException;
+     84▕             }
+     85▕         });
+     86▕     }
+     87▕ }
+
+      [2m+19 vendor frames [22m
+  20  tests/Feature/Auth/PasswordResetTest.php:28
+
+  ────────────────────────────────────────────────────────────────────────────  
+   FAILED  Tests\Feature\Auth\PasswordResetTest > pa…  MissingAppKeyException   
+  No application encryption key has been specified.
+
+  at vendor/laravel/framework/src/Illuminate/Encryption/EncryptionServiceProvider.php:83
+     79▕     protected function key(array $config)
+     80▕     {
+     81▕         return tap($config['key'], function ($key) {
+     82▕             if (empty($key)) {
+  ➜  83▕                 throw new MissingAppKeyException;
+     84▕             }
+     85▕         });
+     86▕     }
+     87▕ }
+
+      [2m+19 vendor frames [22m
+  20  tests/Feature/Auth/PasswordResetTest.php:44
+
+  ────────────────────────────────────────────────────────────────────────────  
+   FAILED  Tests\Feature\Auth\PasswordUpdateTest > p…  MissingAppKeyException   
+  No application encryption key has been specified.
+
+  at vendor/laravel/framework/src/Illuminate/Encryption/EncryptionServiceProvider.php:83
+     79▕     protected function key(array $config)
+     80▕     {
+     81▕         return tap($config['key'], function ($key) {
+     82▕             if (empty($key)) {
+  ➜  83▕                 throw new MissingAppKeyException;
+     84▕             }
+     85▕         });
+     86▕     }
+     87▕ }
+
+      [2m+19 vendor frames [22m
+  20  tests/Feature/Auth/PasswordUpdateTest.php:12
+
+  ────────────────────────────────────────────────────────────────────────────  
+   FAILED  Tests\Feature\Auth\PasswordUpdateTest > c…  MissingAppKeyException   
+  No application encryption key has been specified.
+
+  at vendor/laravel/framework/src/Illuminate/Encryption/EncryptionServiceProvider.php:83
+     79▕     protected function key(array $config)
+     80▕     {
+     81▕         return tap($config['key'], function ($key) {
+     82▕             if (empty($key)) {
+  ➜  83▕                 throw new MissingAppKeyException;
+     84▕             }
+     85▕         });
+     86▕     }
+     87▕ }
+
+      [2m+19 vendor frames [22m
+  20  tests/Feature/Auth/PasswordUpdateTest.php:31
+
+  ────────────────────────────────────────────────────────────────────────────  
+   FAILED  Tests\Feature\Auth\RegistrationTest > reg…  MissingAppKeyException   
+  No application encryption key has been specified.
+
+  at vendor/laravel/framework/src/Illuminate/Encryption/EncryptionServiceProvider.php:83
+     79▕     protected function key(array $config)
+     80▕     {
+     81▕         return tap($config['key'], function ($key) {
+     82▕             if (empty($key)) {
+  ➜  83▕                 throw new MissingAppKeyException;
+     84▕             }
+     85▕         });
+     86▕     }
+     87▕ }
+
+      [2m+19 vendor frames [22m
+  20  tests/Feature/Auth/RegistrationTest.php:4
+
+  ────────────────────────────────────────────────────────────────────────────  
+   FAILED  Tests\Feature\Auth\RegistrationTest > new…  MissingAppKeyException   
+  No application encryption key has been specified.
+
+  at vendor/laravel/framework/src/Illuminate/Encryption/EncryptionServiceProvider.php:83
+     79▕     protected function key(array $config)
+     80▕     {
+     81▕         return tap($config['key'], function ($key) {
+     82▕             if (empty($key)) {
+  ➜  83▕                 throw new MissingAppKeyException;
+     84▕             }
+     85▕         });
+     86▕     }
+     87▕ }
+
+      [2m+19 vendor frames [22m
+  20  tests/Feature/Auth/RegistrationTest.php:10
+
+  ────────────────────────────────────────────────────────────────────────────  
+   FAILED  Tests\Feature\BookTest > guest cannot vie…  MissingAppKeyException   
+  No application encryption key has been specified.
+
+  at vendor/laravel/framework/src/Illuminate/Encryption/EncryptionServiceProvider.php:83
+     79▕     protected function key(array $config)
+     80▕     {
+     81▕         return tap($config['key'], function ($key) {
+     82▕             if (empty($key)) {
+  ➜  83▕                 throw new MissingAppKeyException;
+     84▕             }
+     85▕         });
+     86▕     }
+     87▕ }
+
+      [2m+19 vendor frames [22m
+  20  tests/Feature/BookTest.php:11
+
+  ────────────────────────────────────────────────────────────────────────────  
+   FAILED  Tests\Feature\BookTest > user can view bo…  MissingAppKeyException   
+  No application encryption key has been specified.
+
+  at vendor/laravel/framework/src/Illuminate/Encryption/EncryptionServiceProvider.php:83
+     79▕     protected function key(array $config)
+     80▕     {
+     81▕         return tap($config['key'], function ($key) {
+     82▕             if (empty($key)) {
+  ➜  83▕                 throw new MissingAppKeyException;
+     84▕             }
+     85▕         });
+     86▕     }
+     87▕ }
+
+      [2m+19 vendor frames [22m
+  20  tests/Feature/BookTest.php:21
+
+  ────────────────────────────────────────────────────────────────────────────  
+   FAILED  Tests\Feature\BookTest > admin can create…  MissingAppKeyException   
+  No application encryption key has been specified.
+
+  at vendor/laravel/framework/src/Illuminate/Encryption/EncryptionServiceProvider.php:83
+     79▕     protected function key(array $config)
+     80▕     {
+     81▕         return tap($config['key'], function ($key) {
+     82▕             if (empty($key)) {
+  ➜  83▕                 throw new MissingAppKeyException;
+     84▕             }
+     85▕         });
+     86▕     }
+     87▕ }
+
+      [2m+19 vendor frames [22m
+  20  tests/Feature/BookTest.php:39
+
+  ────────────────────────────────────────────────────────────────────────────  
+   FAILED  Tests\Feature\BookTest > user cannot crea…  MissingAppKeyException   
+  No application encryption key has been specified.
+
+  at vendor/laravel/framework/src/Illuminate/Encryption/EncryptionServiceProvider.php:83
+     79▕     protected function key(array $config)
+     80▕     {
+     81▕         return tap($config['key'], function ($key) {
+     82▕             if (empty($key)) {
+  ➜  83▕                 throw new MissingAppKeyException;
+     84▕             }
+     85▕         });
+     86▕     }
+     87▕ }
+
+      [2m+19 vendor frames [22m
+  20  tests/Feature/BookTest.php:56
+
+  ────────────────────────────────────────────────────────────────────────────  
+   FAILED  Tests\Feature\BookTest > admin can add co…  MissingAppKeyException   
+  No application encryption key has been specified.
+
+  at vendor/laravel/framework/src/Illuminate/Encryption/EncryptionServiceProvider.php:83
+     79▕     protected function key(array $config)
+     80▕     {
+     81▕         return tap($config['key'], function ($key) {
+     82▕             if (empty($key)) {
+  ➜  83▕                 throw new MissingAppKeyException;
+     84▕             }
+     85▕         });
+     86▕     }
+     87▕ }
+
+      [2m+19 vendor frames [22m
+  20  tests/Feature/BookTest.php:65
+
+  ────────────────────────────────────────────────────────────────────────────  
+   FAILED  Tests\Feature\ExampleTest > it returns a…   MissingAppKeyException   
+  No application encryption key has been specified.
+
+  at vendor/laravel/framework/src/Illuminate/Encryption/EncryptionServiceProvider.php:83
+     79▕     protected function key(array $config)
+     80▕     {
+     81▕         return tap($config['key'], function ($key) {
+     82▕             if (empty($key)) {
+  ➜  83▕                 throw new MissingAppKeyException;
+     84▕             }
+     85▕         });
+     86▕     }
+     87▕ }
+
+      [2m+19 vendor frames [22m
+  20  tests/Feature/ExampleTest.php:4
+
+  ────────────────────────────────────────────────────────────────────────────  
+   FAILED  Tests\Feature\ProfileTest > profile page…   MissingAppKeyException   
+  No application encryption key has been specified.
+
+  at vendor/laravel/framework/src/Illuminate/Encryption/EncryptionServiceProvider.php:83
+     79▕     protected function key(array $config)
+     80▕     {
+     81▕         return tap($config['key'], function ($key) {
+     82▕             if (empty($key)) {
+  ➜  83▕                 throw new MissingAppKeyException;
+     84▕             }
+     85▕         });
+     86▕     }
+     87▕ }
+
+      [2m+19 vendor frames [22m
+  20  tests/Feature/ProfileTest.php:10
+
+  ────────────────────────────────────────────────────────────────────────────  
+   FAILED  Tests\Feature\ProfileTest > profile infor…  MissingAppKeyException   
+  No application encryption key has been specified.
+
+  at vendor/laravel/framework/src/Illuminate/Encryption/EncryptionServiceProvider.php:83
+     79▕     protected function key(array $config)
+     80▕     {
+     81▕         return tap($config['key'], function ($key) {
+     82▕             if (empty($key)) {
+  ➜  83▕                 throw new MissingAppKeyException;
+     84▕             }
+     85▕         });
+     86▕     }
+     87▕ }
+
+      [2m+19 vendor frames [22m
+  20  tests/Feature/ProfileTest.php:20
+
+  ────────────────────────────────────────────────────────────────────────────  
+   FAILED  Tests\Feature\ProfileTest > email verific…  MissingAppKeyException   
+  No application encryption key has been specified.
+
+  at vendor/laravel/framework/src/Illuminate/Encryption/EncryptionServiceProvider.php:83
+     79▕     protected function key(array $config)
+     80▕     {
+     81▕         return tap($config['key'], function ($key) {
+     82▕             if (empty($key)) {
+  ➜  83▕                 throw new MissingAppKeyException;
+     84▕             }
+     85▕         });
+     86▕     }
+     87▕ }
+
+      [2m+19 vendor frames [22m
+  20  tests/Feature/ProfileTest.php:41
+
+  ────────────────────────────────────────────────────────────────────────────  
+   FAILED  Tests\Feature\ProfileTest > user can dele…  MissingAppKeyException   
+  No application encryption key has been specified.
+
+  at vendor/laravel/framework/src/Illuminate/Encryption/EncryptionServiceProvider.php:83
+     79▕     protected function key(array $config)
+     80▕     {
+     81▕         return tap($config['key'], function ($key) {
+     82▕             if (empty($key)) {
+  ➜  83▕                 throw new MissingAppKeyException;
+     84▕             }
+     85▕         });
+     86▕     }
+     87▕ }
+
+      [2m+19 vendor frames [22m
+  20  tests/Feature/ProfileTest.php:58
+
+  ────────────────────────────────────────────────────────────────────────────  
+   FAILED  Tests\Feature\ProfileTest > correct passw…  MissingAppKeyException   
+  No application encryption key has been specified.
+
+  at vendor/laravel/framework/src/Illuminate/Encryption/EncryptionServiceProvider.php:83
+     79▕     protected function key(array $config)
+     80▕     {
+     81▕         return tap($config['key'], function ($key) {
+     82▕             if (empty($key)) {
+  ➜  83▕                 throw new MissingAppKeyException;
+     84▕             }
+     85▕         });
+     86▕     }
+     87▕ }
+
+      [2m+19 vendor frames [22m
+  20  tests/Feature/ProfileTest.php:76
+
+  ────────────────────────────────────────────────────────────────────────────  
+   FAILED  Tests\Feature\ReservationTest > user can…   MissingAppKeyException   
+  No application encryption key has been specified.
+
+  at vendor/laravel/framework/src/Illuminate/Encryption/EncryptionServiceProvider.php:83
+     79▕     protected function key(array $config)
+     80▕     {
+     81▕         return tap($config['key'], function ($key) {
+     82▕             if (empty($key)) {
+  ➜  83▕                 throw new MissingAppKeyException;
+     84▕             }
+     85▕         });
+     86▕     }
+     87▕ }
+
+      [2m+19 vendor frames [22m
+  20  tests/Feature/ReservationTest.php:22
+
+  ────────────────────────────────────────────────────────────────────────────  
+   FAILED  Tests\Feature\ReservationTest > user can…   MissingAppKeyException   
+  No application encryption key has been specified.
+
+  at vendor/laravel/framework/src/Illuminate/Encryption/EncryptionServiceProvider.php:83
+     79▕     protected function key(array $config)
+     80▕     {
+     81▕         return tap($config['key'], function ($key) {
+     82▕             if (empty($key)) {
+  ➜  83▕                 throw new MissingAppKeyException;
+     84▕             }
+     85▕         });
+     86▕     }
+     87▕ }
+
+      [2m+19 vendor frames [22m
+  20  tests/Feature/ReservationTest.php:33
+
+  ────────────────────────────────────────────────────────────────────────────  
+   FAILED  Tests\Feature\ReservationTest > user gets…  MissingAppKeyException   
+  No application encryption key has been specified.
+
+  at vendor/laravel/framework/src/Illuminate/Encryption/EncryptionServiceProvider.php:83
+     79▕     protected function key(array $config)
+     80▕     {
+     81▕         return tap($config['key'], function ($key) {
+     82▕             if (empty($key)) {
+  ➜  83▕                 throw new MissingAppKeyException;
+     84▕             }
+     85▕         });
+     86▕     }
+     87▕ }
+
+      [2m+19 vendor frames [22m
+  20  tests/Feature/ReservationTest.php:52
+
+  ────────────────────────────────────────────────────────────────────────────  
+   FAILED  Tests\Feature\ReservationTest > user can…   MissingAppKeyException   
+  No application encryption key has been specified.
+
+  at vendor/laravel/framework/src/Illuminate/Encryption/EncryptionServiceProvider.php:83
+     79▕     protected function key(array $config)
+     80▕     {
+     81▕         return tap($config['key'], function ($key) {
+     82▕             if (empty($key)) {
+  ➜  83▕                 throw new MissingAppKeyException;
+     84▕             }
+     85▕         });
+     86▕     }
+     87▕ }
+
+      [2m+19 vendor frames [22m
+  20  tests/Feature/ReservationTest.php:73
+
+
+  Tests:    39 failed, 8 passed (15 assertions)
+  Duration: 5.48s
+
