@@ -14,12 +14,15 @@ class Reservation extends Model
         'book_id',
         'reserved_at',
         'return_date',
+        'returned_at',
         'status',
+        'notes',
     ];
 
     protected $casts = [
         'reserved_at' => 'datetime',
         'return_date' => 'date',
+        'returned_at' => 'datetime',
     ];
 
     public function user()

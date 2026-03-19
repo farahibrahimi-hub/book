@@ -17,7 +17,9 @@ return new class extends Migration
             $table->foreignId('book_id')->constrained()->cascadeOnDelete();
             $table->timestamp('reserved_at')->useCurrent();
             $table->date('return_date')->nullable();
+            $table->timestamp('returned_at')->nullable();
             $table->enum('status', ['active', 'returned', 'late'])->default('active');
+            $table->text('notes')->nullable();
             $table->timestamps();
         });
     }

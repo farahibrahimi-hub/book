@@ -2,14 +2,21 @@
 
 namespace App\Http\Controllers;
 
+use App\Http\Requests\StoreReservationRequest;
 use App\Models\Book;
 use App\Models\Reservation;
 use App\Models\User;
+use App\Services\ReservationService;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Auth;
 
 class ReservationController extends Controller
 {
+    public function __construct(protected ReservationService $service)
+    {
+        $this->middleware(['auth', 'verified', \App\Http\Middleware\EnsureUserIsActive::class]);
+    }
+
     public function index()
     {
         /** @var User|null $user */
@@ -31,41 +38,18 @@ class ReservationController extends Controller
         return view('reservations.index', compact('reservations'));
     }
 
-    public function store(Request $request)
+    public function store(StoreReservationRequest $request)
     {
-        /** @var User|null $user */
         $user = Auth::user();
+        $book = Book::findOrFail($request->book_id);
 
-        $data = $request->validate([
-            'book_id' => 'required|exists:books,id',
-        ]);
+        try {
+            $this->service->reserve($user, $book, $request->input('notes'));
 
-        $book = Book::findOrFail($data['book_id']);
-
-        if ($book->available_copies < 1) {
-            return redirect()->back()->with('error', 'No copies available.');
+            return redirect()->route('reservations.index')->with('success', 'Book reserved successfully.');
+        } catch (\InvalidArgumentException $e) {
+            return redirect()->back()->with('error', $e->getMessage());
         }
-
-        $activeReservations = $user->reservations()->where('status', 'active')->count();
-        if ($activeReservations >= 3) {
-            return redirect()->back()->with('error', 'You can only have 3 active reservations.');
-        }
-
-        $hasActiveBook = $user->reservations()->where('book_id', $book->id)->where('status', 'active')->exists();
-        if ($hasActiveBook) {
-            return redirect()->back()->with('error', 'You already have an active reservation for this book.');
-        }
-
-        $reservation = $user->reservations()->create([
-            'book_id' => $book->id,
-            'reserved_at' => now(),
-            'return_date' => now()->addDays(7),
-            'status' => 'active',
-        ]);
-
-        $book->decrement('available_copies');
-
-        return redirect()->route('reservations.index')->with('success', 'Book reserved successfully.');
     }
 
     public function returnBook(Reservation $reservation)
@@ -77,15 +61,12 @@ class ReservationController extends Controller
             abort(403);
         }
 
-        if ($reservation->status === 'returned') {
-            return redirect()->back()->with('error', 'Reservation already returned.');
+        try {
+            $this->service->return($reservation);
+
+            return redirect()->route('reservations.index')->with('success', 'Book returned successfully.');
+        } catch (\InvalidArgumentException $e) {
+            return redirect()->back()->with('error', $e->getMessage());
         }
-
-        $reservation->status = 'returned';
-        $reservation->save();
-
-        $reservation->book->increment('available_copies');
-
-        return redirect()->route('reservations.index')->with('success', 'Book returned successfully.');
     }
 }
