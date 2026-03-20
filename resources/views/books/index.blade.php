@@ -37,11 +37,7 @@
         <button type="submit" class="px-3 py-2 bg-blue-500 text-white rounded">Filter</button>
     </form>
 
-    @auth
-    @if(auth()->user()->isAdmin())
-        <a href="{{ route('admin.books.create') }}" class="px-4 py-2 bg-green-500 text-white rounded">Add Book</a>
-    @endif
-    @endauth
+
 
     <div class="mt-4 grid grid-cols-1 gap-4">
         @forelse($books as $book)
@@ -66,15 +62,6 @@
                                 {{ ($book->available_copies_count ?? 0) > 0 ? 'Reserve' : 'Join Queue' }}
                             </button>
                         </form>
-                        @if(auth()->user()->isAdmin())
-                            <a href="{{ route('admin.books.edit', $book) }}" class="px-3 py-1 bg-yellow-500 text-white rounded">Edit</a>
-                            <a href="{{ route('admin.books.copies.index', $book) }}" class="px-3 py-1 bg-purple-500 text-white rounded">Copies</a>
-                            <form action="{{ route('admin.books.destroy', $book) }}" method="POST" onsubmit="return confirm('Delete?')">
-                                @csrf
-                                @method('DELETE')
-                                <button class="px-3 py-1 bg-red-600 text-white rounded">Delete</button>
-                            </form>
-                        @endif
                     @endauth
                 </div>
             </div>
